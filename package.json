@@ -5,7 +5,7 @@
   "main": "src/server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "rm -rf tsc && tsc",
+    "compile": "./markov-build.sh && rm -rf tsc && tsc",
     "start": "node build/src/server.js",
     "quick": "npm run compile && npm start"
   },
@@ -21,6 +21,7 @@
   "homepage": "https://github.com/Arkanic/SKINWALKER-BOT#readme",
   "dependencies": {
     "discord.js": "^14.17.3",
+    "koffi": "^2.10.1",
     "typescript": "^5.7.3"
   }
 }
