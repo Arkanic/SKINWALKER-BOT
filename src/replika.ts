@@ -26,12 +26,16 @@ export default class Replika {
     }
 
     train(text:string) {
-        baremetal.markov_train(this.markov, text);
+        baremetal.markov_train(this.markov, [text]);
     }
 
-    generate(maxwordcount:number, startword?:string):string {
-        let word:string | null = startword ? startword : null;
-        return baremetal.markov_generate(this.markov, word, maxwordcount);
+    generate(maxwordcount:number, startword?:string):Promise<string> {
+        return new Promise((resolve, reject) => {
+            let word:string | null = startword ? startword : null;
+            let result = baremetal.markov_generate(this.markov, word, maxwordcount);
+            if(baremetal == null) reject();
+            else resolve(result);
+        });
     }
 
     save() {

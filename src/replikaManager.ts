@@ -45,7 +45,7 @@ export default class ReplikaManager {
         this.replikas[id].replika.train(content);
     }
 
-    generate(id:string, maxwordcount:number, startword?:string) {
+    generate(id:string, maxwordcount:number, startword?:string):Promise<string> {
         this.add(id);
         return this.replikas[id].replika.generate(maxwordcount, startword);
     }
