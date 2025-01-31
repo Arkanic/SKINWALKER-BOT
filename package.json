@@ -1,0 +1,25 @@
+{
+  "name": "skinwalker-bot",
+  "version": "1.0.0",
+  "description": "evil discord bot",
+  "main": "src/server.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "tsc",
+    "start": "node build/server.js",
+    "quick": "npm run compile && npm start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Arkanic/SKINWALKER-BOT.git"
+  },
+  "author": "Arkanic",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Arkanic/SKINWALKER-BOT/issues"
+  },
+  "homepage": "https://github.com/Arkanic/SKINWALKER-BOT#readme",
+  "dependencies": {
+    "typescript": "^5.7.3"
+  }
+}
