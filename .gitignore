@@ -3,3 +3,4 @@ build
 config.js
 markov.so
 markov/markov
+models
