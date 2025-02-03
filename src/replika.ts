@@ -1,17 +1,18 @@
 import fs from "fs";
 import path from "path";
-import * as baremetal from "./baremetal";
+import {DataType, JsExternal, PointerType, freePointer} from "ffi-rs";
+import baremetal from "./baremetal";
 
 if(!fs.existsSync("models")) fs.mkdirSync("models");
 
-type MarkovChain = any;
+type MarkovChain = JsExternal;
 function coldchainGetOrCreate(id:string):MarkovChain {
     if(/[^0-9]/.test(id)) throw new Error("ID is non-numeric!");
 
     let chain;
     const modelPath = path.join("models", `${id}.mkd`);
-    if(fs.existsSync(modelPath)) chain = baremetal.markov_fromfile(modelPath);
-    else chain = baremetal.markov_new();
+    if(fs.existsSync(modelPath)) chain = baremetal.markov_fromfile([modelPath]);
+    else chain = baremetal.markov_new([]);
 
     return chain;
 }
@@ -26,24 +27,24 @@ export default class Replika {
     }
 
     train(text:string) {
-        baremetal.markov_train(this.markov, [text]);
+        baremetal.markov_train([this.markov, text]);
     }
 
     generate(maxwordcount:number, startword?:string):Promise<string> {
         return new Promise((resolve, reject) => {
-            let word:string | null = startword ? startword : null;
-            let result = baremetal.markov_generate(this.markov, word, maxwordcount);
-            if(baremetal == null) reject();
+            let word:string = startword ? startword : baremetal.markov_getfirst([this.markov]);
+            let result = baremetal.markov_generate([this.markov, word, maxwordcount]);
+            if(result == null) reject();
             else resolve(result);
         });
     }
 
     save() {
-        baremetal.markov_writefile(this.markov, path.join("models", `${this.id}.mkd`));
+        baremetal.markov_writefile([this.markov, path.join("models", `${this.id}.mkd`)]);
     }
 
     close() {
         this.save();
-        baremetal.markov_free(this.markov);
+        baremetal.markov_free([this.markov]);
     }
 }

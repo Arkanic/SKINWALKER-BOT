@@ -1,4 +1,4 @@
-import {Client, Emoji, Events, GatewayIntentBits} from "discord.js";
+import {Client, Events, GatewayIntentBits} from "discord.js";
 import ReplikaManager from "./replikaManager";
 
 import token from "../config";
@@ -16,7 +16,7 @@ let replikas = new ReplikaManager(1000 * 60 * 30); // users sit for 30 min in me
 client.on(Events.MessageCreate, async message => {
     if(message.author.id == client.user!.id) return;
     if(!message.content.startsWith("fake")) {
-        console.log("training...");
+        console.log("training... " + message.content);
         return replikas.train(message.author.id, message.content);
     }
     let parts = message.content.split(" ");

@@ -1,15 +1,51 @@
-import koffi from "koffi";
-import fs from "fs";
+import {open, define, DataType} from "ffi-rs";
 
-const markov = koffi.load("./markov.so");
-
-export const markov_chain = koffi.struct("markov_chain", {
-    words: "void *"
+open({
+    library: "markov",
+    path: "./markov.so",
 });
 
-export const markov_new = markov.func("markov_chain *markov_new(void)");
-export const markov_free = markov.func("void markov_free(_Inout_ markov_chain *chain)");
-export const markov_train = markov.func("void markov_train(_Inout_ markov_chain *chain, _Inout_ char *text)");
-export const markov_generate = markov.func("char *markov_generate(_Inout_ markov_chain *chain, char *first, unsigned long maxparticlelen)");
-export const markov_writefile = markov.func("void markov_writefile(_Inout_ markov_chain *chain, char *outpath)");
-export const markov_fromfile = markov.func("markov_chain *markov_fromfile(char *inpath)");
+
+const markov = define({
+    markov_new: {
+        library: "markov",
+        retType: DataType.External,
+        paramsType: []
+    },
+    markov_free: {
+        library: "markov",
+        retType: DataType.Void,
+        paramsType: [DataType.External]
+    },
+    markov_train: {
+        library: "markov",
+        retType: DataType.Void,
+        paramsType: [DataType.External, DataType.String]
+    },
+    markov_getfirst: {
+        library: "markov",
+        retType: DataType.String,
+        paramsType: [DataType.External]
+    },
+    markov_generate: {
+        library: "markov",
+        retType: DataType.String,
+        paramsType: [DataType.External, DataType.String, DataType.U64]
+    },
+    markov_libc_free: {
+        library: "markov",
+        retType: DataType.Void,
+        paramsType: [DataType.External]
+    },
+    markov_writefile: {
+        library: "markov",
+        retType: DataType.Void,
+        paramsType: [DataType.External, DataType.String]
+    },
+    markov_fromfile: {
+        library: "markov",
+        retType: DataType.External,
+        paramsType: [DataType.String]
+    }
+});
+export default markov;

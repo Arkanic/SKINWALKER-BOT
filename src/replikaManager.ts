@@ -20,16 +20,15 @@ export default class ReplikaManager {
             this.replikas[id].cleartimeout = setTimeout(() => {
                 this.remove(id);
             }, this.maxidle);
+        } else {
+            let replika:ReplikaBox = {
+                replika: new Replika(id),
+                cleartimeout: setTimeout(() => {
+                    this.remove(id);
+                }, this.maxidle)
+            }
+            this.replikas[id] = replika;
         }
-
-        let replika:ReplikaBox = {
-            replika: new Replika(id),
-            cleartimeout: setTimeout(() => {
-                this.remove(id);
-            }, this.maxidle)
-        }
-
-        this.replikas[id] = replika;
     }
 
     private remove(id:string) {
