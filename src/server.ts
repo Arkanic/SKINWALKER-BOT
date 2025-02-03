@@ -22,8 +22,9 @@ client.on(Events.MessageCreate, async message => {
     let parts = message.content.split(" ");
     parts.shift();
     if(parts.length < 1) return;
-    message.guild?.members.search({query: parts.shift()!, limit: 1}).then((members) => {
-        if(members.size <= 0) return;
+    let content = parts.join(" ");
+    message.guild?.members.search({query: content, limit: 1}).then((members) => {
+        if(members.size <= 0) return message.react("❌");
         replikas.generate(members.first()!.id, 500).then((generated) => {
             message.channel.send(generated.substring(0, 2000));
         }).catch(() => {

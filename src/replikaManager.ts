@@ -14,6 +14,10 @@ export default class ReplikaManager {
         this.maxidle = maxidle;
     }
 
+    private exists(id:string) {
+        return !!this.replikas[id];
+    }
+
     private add(id:string) {
         if(this.replikas[id]) {
             clearTimeout(this.replikas[id].cleartimeout);
@@ -45,7 +49,7 @@ export default class ReplikaManager {
     }
 
     generate(id:string, maxwordcount:number, startword?:string):Promise<string> {
-        this.add(id);
+        if(!this.exists(id)) return new Promise((resolve, reject) => reject());
         return this.replikas[id].replika.generate(maxwordcount, startword);
     }
 
