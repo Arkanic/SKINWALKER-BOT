@@ -3,19 +3,19 @@ import path from "path";
 import {DataType, JsExternal, PointerType, freePointer} from "ffi-rs";
 import baremetal from "./baremetal";
 
-if(!fs.existsSync("models")) fs.mkdirSync("models");
+//if(!fs.existsSync("models")) fs.mkdirSync("models");
 
-export function doesColdchainExist(id:string):boolean {
+export function doesColdchainExist(folder:string, id:string):boolean {
     if(/[^0-9]/.test(id)) throw new Error("ID is non-numeric!");
-    return fs.existsSync(path.join("models", `${id}.mkd`));
+    return fs.existsSync(path.join(folder, `${id}.mkd`));
 }
 
 type MarkovChain = JsExternal;
-function coldchainGetOrCreate(id:string):MarkovChain {
+function coldchainGetOrCreate(folder:string, id:string):MarkovChain {
     if(/[^0-9]/.test(id)) throw new Error("ID is non-numeric!");
 
     let chain;
-    const modelPath = path.join("models", `${id}.mkd`);
+    const modelPath = path.join(folder, `${id}.mkd`);
     if(fs.existsSync(modelPath)) chain = baremetal.markov_fromfile([modelPath]);
     else chain = baremetal.markov_new([]);
 
@@ -24,11 +24,13 @@ function coldchainGetOrCreate(id:string):MarkovChain {
 
 export default class Replika {
     id:string;
+    folder:string;
     markov:MarkovChain;
 
-    constructor(id:string) {
+    constructor(folder:string, id:string) {
         this.id = id;
-        this.markov = coldchainGetOrCreate(this.id);
+        this.folder = folder;
+        this.markov = coldchainGetOrCreate(this.folder, this.id);
     }
 
     train(text:string) {
@@ -45,7 +47,7 @@ export default class Replika {
     }
 
     save() {
-        baremetal.markov_writefile([this.markov, path.join("models", `${this.id}.mkd`)]);
+        baremetal.markov_writefile([this.markov, path.join(this.folder, `${this.id}.mkd`)]);
     }
 
     close() {
