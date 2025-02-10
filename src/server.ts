@@ -1,7 +1,7 @@
 import {Client, Events, GatewayIntentBits, GuildMember} from "discord.js";
 import ReplikaManager from "./replikaManager";
 
-import token from "../config";
+import {token, modelpath} from "../config";
 
 const client = new Client({
     intents: [
@@ -11,7 +11,7 @@ const client = new Client({
     ]
 });
 
-let replikas = new ReplikaManager(1000 * 60 * 30); // users sit for 30 min in memory
+let replikas = new ReplikaManager(modelpath, 1000 * 60 * 30); // users sit for 30 min in memory
 
 client.on(Events.MessageCreate, async message => {
     if(message.author.id == client.user!.id) return;
