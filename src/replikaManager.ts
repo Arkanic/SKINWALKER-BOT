@@ -8,15 +8,17 @@ interface ReplikaBox {
 export default class ReplikaManager {
     replikas:{[unit:string]:ReplikaBox};
     maxidle:number;
+    folder:string;
 
-    constructor(maxidle:number) {
+    constructor(folder:string, maxidle:number) {
         this.replikas = {};
         this.maxidle = maxidle;
+        this.folder = folder;
     }
 
     private exists(id:string) {
         if(this.replikas[id]) return true;
-        else return doesColdchainExist(id);
+        else return doesColdchainExist(this.folder, id);
     }
 
     private add(id:string) {
@@ -27,7 +29,7 @@ export default class ReplikaManager {
             }, this.maxidle);
         } else {
             let replika:ReplikaBox = {
-                replika: new Replika(id),
+                replika: new Replika(this.folder, id),
                 cleartimeout: setTimeout(() => {
                     this.remove(id);
                 }, this.maxidle)
