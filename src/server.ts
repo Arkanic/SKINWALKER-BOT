@@ -1,4 +1,4 @@
-import {Client, Events, GatewayIntentBits} from "discord.js";
+import {Client, Events, GatewayIntentBits, GuildMember} from "discord.js";
 import ReplikaManager from "./replikaManager";
 
 import token from "../config";
@@ -15,23 +15,34 @@ let replikas = new ReplikaManager(1000 * 60 * 30); // users sit for 30 min in me
 
 client.on(Events.MessageCreate, async message => {
     if(message.author.id == client.user!.id) return;
-    if(!message.content.startsWith("fake")) {
+    if(!message.guild) return; // is a dm
+
+    if(!message.content.startsWith("fake")) { // not asking to generate, so lets feed the model
         console.log(`[train] ${message.author.username}`);
         return replikas.train(message.author.id, message.content);
     }
+
     let parts = message.content.split(" ");
     parts.shift();
     if(parts.length < 1) return;
     let content = parts.join(" ");
-    message.guild?.members.search({query: content, limit: 1}).then((members) => {
-        if(members.size <= 0) return message.react("❌");
-        const member = members.first()!
-        replikas.generate(member.id, 500).then((generated) => {
-            console.log(`[generate] ${member.user.username}`);
-            message.channel.send(generated.substring(0, 2000));
-        }).catch((e) => {
-            message.react("❌");
-        });
+    
+    let member:GuildMember | undefined;
+    if(content.startsWith("<@") && content.endsWith(">")) { // traditional @whatever
+        member = await message.guild?.members.fetch(content.slice(2, content.length - 1))
+    } else if(!/[^0-9]/.test(content)) { // id sent as text
+        member = await message.guild?.members.fetch(content);
+    } else { // username sent as text
+        let members = await message.guild?.members.search({query: content, limit: 1})
+        if(members.size > 0) member = members.first();
+    }
+    
+    if(!member) return message.react("❌");
+    replikas.generate(member.id, 500).then((generated) => {
+        console.log(`[generate] ${member.user.username}`);
+        message.channel.send(generated.substring(0, 2000));
+    }).catch((e) => {
+        message.react("❌");
     });
 });
 
