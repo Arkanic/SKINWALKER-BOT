@@ -1,4 +1,4 @@
-import Replika from "./replika"
+import Replika, {doesColdchainExist} from "./replika"
 
 interface ReplikaBox {
     replika: Replika;
@@ -15,7 +15,8 @@ export default class ReplikaManager {
     }
 
     private exists(id:string) {
-        return !!this.replikas[id];
+        if(this.replikas[id]) return true;
+        else return doesColdchainExist(id);
     }
 
     private add(id:string) {
@@ -50,6 +51,7 @@ export default class ReplikaManager {
 
     generate(id:string, maxwordcount:number, startword?:string):Promise<string> {
         if(!this.exists(id)) return new Promise((resolve, reject) => reject());
+        this.add(id);
         return this.replikas[id].replika.generate(maxwordcount, startword);
     }
 

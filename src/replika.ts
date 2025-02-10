@@ -5,6 +5,11 @@ import baremetal from "./baremetal";
 
 if(!fs.existsSync("models")) fs.mkdirSync("models");
 
+export function doesColdchainExist(id:string):boolean {
+    if(/[^0-9]/.test(id)) throw new Error("ID is non-numeric!");
+    return fs.existsSync(path.join("models", `${id}.mkd`));
+}
+
 type MarkovChain = JsExternal;
 function coldchainGetOrCreate(id:string):MarkovChain {
     if(/[^0-9]/.test(id)) throw new Error("ID is non-numeric!");

@@ -16,7 +16,7 @@ let replikas = new ReplikaManager(1000 * 60 * 30); // users sit for 30 min in me
 client.on(Events.MessageCreate, async message => {
     if(message.author.id == client.user!.id) return;
     if(!message.content.startsWith("fake")) {
-        console.log("training... " + message.content);
+        console.log(`[train] ${message.author.username}`);
         return replikas.train(message.author.id, message.content);
     }
     let parts = message.content.split(" ");
@@ -25,9 +25,11 @@ client.on(Events.MessageCreate, async message => {
     let content = parts.join(" ");
     message.guild?.members.search({query: content, limit: 1}).then((members) => {
         if(members.size <= 0) return message.react("❌");
-        replikas.generate(members.first()!.id, 500).then((generated) => {
+        const member = members.first()!
+        replikas.generate(member.id, 500).then((generated) => {
+            console.log(`[generate] ${member.user.username}`);
             message.channel.send(generated.substring(0, 2000));
-        }).catch(() => {
+        }).catch((e) => {
             message.react("❌");
         });
     });
