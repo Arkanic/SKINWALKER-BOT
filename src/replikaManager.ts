@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import Replika, {doesColdchainExist} from "./replika"
 
 interface ReplikaBox {
@@ -7,13 +9,19 @@ interface ReplikaBox {
 
 export default class ReplikaManager {
     replikas:{[unit:string]:ReplikaBox};
+    usernames:{[unit:string]:string};
     maxidle:number;
     folder:string;
 
+    private usernamesLastSaved = 0;
+
     constructor(folder:string, maxidle:number) {
         this.replikas = {};
+        this.usernames = {};
         this.maxidle = maxidle;
         this.folder = folder;
+
+        this.readUsernameTranslation();
     }
 
     private exists(id:string) {
@@ -57,9 +65,36 @@ export default class ReplikaManager {
         return this.replikas[id].replika.generate(maxwordcount, startword);
     }
 
+    private readUsernameTranslation() {
+        const usernamesPath = path.join(this.folder, "usernames.json");
+        if(!fs.existsSync(usernamesPath)) return;
+
+        let raw = fs.readFileSync(usernamesPath).toString();
+        this.usernames = JSON.parse(raw);
+    }
+
+    private saveUsernameTranslation() {
+        let serialized = JSON.stringify(this.usernames);
+        fs.writeFileSync(path.join(this.folder, "usernames.json"), serialized);
+    }
+
+    // add to map of username -> id's. This is saved as json, and has the potential to have "dead references" if a user changes
+    // their username. This will be overwritten if a new entry comes along with the same name.
+    addUsernameTranslation(username:string, id:string) {
+        let newUsername = !!this.usernames[username];
+        this.usernames[username] = id;
+        if(newUsername) this.saveUsernameTranslation();
+    }
+
+    translateUsername(username:string):string | undefined {
+        if(!this.usernames[username]) return undefined;
+        return this.usernames[username];
+    }
+
     closeall() {
         for(let i in this.replikas) {
             this.remove(i);
         }
+        this.saveUsernameTranslation();
     }
 }

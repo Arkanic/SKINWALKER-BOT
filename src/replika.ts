@@ -3,8 +3,6 @@ import path from "path";
 import {DataType, JsExternal, PointerType, freePointer} from "ffi-rs";
 import baremetal from "./baremetal";
 
-//if(!fs.existsSync("models")) fs.mkdirSync("models");
-
 export function doesColdchainExist(folder:string, id:string):boolean {
     if(/[^0-9]/.test(id)) throw new Error("ID is non-numeric!");
     return fs.existsSync(path.join(folder, `${id}.mkd`));
