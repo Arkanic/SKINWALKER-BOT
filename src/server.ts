@@ -21,6 +21,11 @@ client.on(Events.MessageCreate, async message => {
     if(message.author.id == client.user!.id) return;
     if(!message.guild) return; // is a dm
 
+    if(message.mentions.has(client.user!.id)) { // ping me!
+        message.channel.send("`fake <username or message id>`");
+        return;
+    }
+
     if(!message.content.startsWith("fake")) { // not asking to generate, so lets feed the model
         replikas.addUsernameTranslation(message.author.username, message.author.id);
         return replikas.train(message.author.id, message.content);
