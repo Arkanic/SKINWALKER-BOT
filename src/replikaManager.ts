@@ -81,14 +81,16 @@ export default class ReplikaManager {
     // add to map of username -> id's. This is saved as json, and has the potential to have "dead references" if a user changes
     // their username. This will be overwritten if a new entry comes along with the same name.
     addUsernameTranslation(username:string, id:string) {
-        let newUsername = !!this.usernames[username];
-        this.usernames[username] = id;
+        let lc = username.toLowerCase();
+        let newUsername = !!this.usernames[lc];
+        this.usernames[lc] = id;
         if(newUsername) this.saveUsernameTranslation();
     }
 
     translateUsername(username:string):string | undefined {
-        if(!this.usernames[username]) return undefined;
-        return this.usernames[username];
+        let lc = username.toLowerCase();
+        if(!this.usernames[lc]) return undefined;
+        return this.usernames[lc];
     }
 
     closeall() {
